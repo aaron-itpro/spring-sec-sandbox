@@ -20,12 +20,23 @@ dependencies {
 }
 
 fun DependencyHandlerScope.spring() {
-    val version = "2.0.3.RELEASE"
-    "org.springframework.boot:spring-boot-starter".let {
-        implementation("$it-web:$version")
-        implementation("$it-thymeleaf:$version")
-        testImplementation("$it-test:$version")
+    fun starter(name: String, isTestDependency: Boolean = false): ExternalModuleDependency {
+        val group = "org.springframework.boot"
+        val artifact = "spring-boot-starter-$name"
+        val version = "2.0.3.RELEASE"
+        return when (isTestDependency) {
+            true -> testImplementation(group, artifact, version)
+            false -> implementation(group, artifact, version)
+        }
     }
+    fun testStarter(name: String) { starter(name, isTestDependency = true) }
+
+    starter("web")
+    starter("thymeleaf")
+    starter("security")
+    testStarter("test")
+
+    testImplementation("org.springframework.security", "spring-security-test", "5.0.6.RELEASE")
 }
 
 fun DependencyHandlerScope.junit() {
